@@ -1,2 +1,4 @@
 node_modules
 .vscode
+\images\output\
+tests/images/unit/diablo-2.png

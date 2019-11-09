@@ -4,7 +4,7 @@
   "description": "Path of Diablo trading made easy",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register tests/**/*.spec.ts"
+    "test": "set NODE_ENV=test&& mocha -r ts-node/register tests/**/*.spec.ts"
   },
   "author": "Carlos Hernández Gómez - Karliky",
   "license": "Unlicense",

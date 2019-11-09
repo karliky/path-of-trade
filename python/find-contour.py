@@ -1,36 +1,50 @@
-from __future__ import print_function
 import cv2 as cv
 import argparse
-max_value = 255
-max_type = 4
+import numpy as np
 max_binary_value = 255
-trackbar_type = 'Type: \n 0: Binary \n 1: Binary Inverted \n 2: Truncate \n 3: To Zero \n 4: To Zero Inverted'
-trackbar_value = 'Value'
-window_name = 'Threshold Demo'
-def Threshold_Demo(val):
-    #0: Binary
+
+def Threshold_Demo(inputPath, outputPath):
     #1: Binary Inverted
-    #2: Threshold Truncated
-    #3: Threshold to Zero
-    #4: Threshold to Zero Inverted
-    threshold_type = cv.getTrackbarPos(trackbar_type, window_name)
-    threshold_value = cv.getTrackbarPos(trackbar_value, window_name)
+    threshold_type = 1
+    threshold_value = 0
     _, dst = cv.threshold(src_gray, threshold_value, max_binary_value, threshold_type )
-    cv.imshow(window_name, dst)
-parser = argparse.ArgumentParser(description='Code for Basic Thresholding Operations tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='images\\test\\shako-original.png')
+    outputResultPath = outputPath + 'result-threshold.png'
+    cv.imwrite(outputResultPath, dst)
+    return outputResultPath
+
+def ROIExtractor(inputPath, outputPath):
+  # Read image as grayscale; threshold to get rid of artifacts
+  _, img = cv.threshold(cv.imread(inputPath, cv.IMREAD_GRAYSCALE), 0, 255, cv.THRESH_BINARY)
+
+  # Get indices of all non-zero elements
+  nz = np.nonzero(img)
+
+  # Find minimum and maximum x and y indices
+  top = np.min(nz[0])
+  bottom = np.max(nz[0])
+  left = np.min(nz[1])
+  right = np.max(nz[1])
+
+  # Create some output
+  output = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+  cv.rectangle(output, (left, top), (right, bottom), (0, 0, 255), 2)
+
+  width = right - left
+  height = bottom - top
+
+  print('{', '"top":', top, ',"width":', width, ',"left":', left, ',"height":', height, '}')
+  # Show results
+  cv.imwrite(outputPath + 'roi-extracted.png', output)
+
+parser = argparse.ArgumentParser(description='Diablo 2 Item Finder')
+parser.add_argument('--input', help='Path to input image.', default='')
+parser.add_argument('--output', help='Output folder.', default='')
 args = parser.parse_args()
 src = cv.imread(cv.samples.findFile(args.input))
 if src is None:
     print('Could not open or find the image: ', args.input)
-    exit(0)
+    exit(5)
 # Convert the image to Gray
 src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-cv.namedWindow(window_name)
-cv.createTrackbar(trackbar_type, window_name , 3, max_type, Threshold_Demo)
-# Create Trackbar to choose Threshold value
-cv.createTrackbar(trackbar_value, window_name , 0, max_value, Threshold_Demo)
-# Call the function to initialize
-Threshold_Demo(0)
-# Wait until user finishes program
-cv.waitKey()
+resultPath = Threshold_Demo(args.input, args.output)
+ROIExtractor(resultPath, args.output)
