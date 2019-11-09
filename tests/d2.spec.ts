@@ -9,7 +9,6 @@ const { spawnSync } = require('child_process');
 const should =  require('should');
 const fsExtra = require('fs-extra');
 import 'should';
-import { Func } from 'mocha';
 
 describe('Unit test - Process finding and getting info of window', () => {
 
@@ -345,6 +344,7 @@ function GetGameClientRect(GetWindowBoudingRect: Function) {
 
 function WaitForGameWindow(lib: WinAPI) {
   return async (HWND:Number) => new Promise((resolve) => {
+    if (lib.GetForegroundWindow() === HWND) return resolve();
     const interval = <any> setInterval(() => windowDetector(interval, resolve, HWND), 100);
   });
 
