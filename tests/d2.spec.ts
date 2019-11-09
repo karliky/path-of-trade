@@ -7,7 +7,9 @@ const StructType = require('ref-struct');
 const sharp = require('sharp');
 const { spawnSync } = require('child_process');
 const should =  require('should');
+const fsExtra = require('fs-extra');
 import 'should';
+import { Func } from 'mocha';
 
 describe('Unit test - Process finding and getting info of window', () => {
 
@@ -46,8 +48,8 @@ describe('Unit test - Process finding and getting info of window', () => {
     const rect = getGameClientRect(HWND);
     rect.left.should.be.eql(16267);
     rect.top.should.be.eql(16268);
-    rect.width.should.be.eql(-16253);
-    rect.height.should.be.eql(-16367);
+    rect.width.should.be.eql(16253);
+    rect.height.should.be.eql(16367);
   });
 
   it('should wait until game window is active', async () => {
@@ -60,7 +62,7 @@ describe('Unit test - Process finding and getting info of window', () => {
   it('should take desktop screenshot', async () => {
     const mockRect = <BoundingRect> { left: 0, top: 0, width: 100, height: 100 };
     const takeScreenshot = TakeScreenshot();
-    const outputPath = `\\images\\unit\\`;
+    const outputPath = `${__dirname}\\images\\unit\\`;
     const screenshotPath = <string> await takeScreenshot(mockRect, outputPath);
     const stats = await statSync(screenshotPath);
     should(stats.isFile()).be.eql(true);
@@ -72,22 +74,22 @@ describe('Unit test - Process finding and getting info of window', () => {
     const fullOutputPath = `${__dirname}${outputPath}`;
     const mockRect = <BoundingRect> { left: 0, top: 0, width: 100, height: 100 };
     const takeScreenshot = TakeScreenshot();
-    await takeScreenshot(mockRect, outputPath);
+    await takeScreenshot(mockRect, `${__dirname}${outputPath}`);
     const findItemRect = FindItemRect();
     const rect = findItemRect(inputPath, fullOutputPath);
-    rect.top.should.be.above(1);
-    rect.width.should.be.above(1);
-    rect.left.should.be.above(1);
-    rect.height.should.be.above(1);
+    rect.top.should.be.above(-1);
+    rect.width.should.be.above(-1);
+    rect.left.should.be.above(-1);
+    rect.height.should.be.above(-1);
   });
 
-  it('should crop game image usin the item rect position', async () => {
+  it('should crop game image using the item rect position', async () => {
     const inputPath = `${__dirname}\\images\\examples\\testing-item.png`;
     const outputPath = `\\images\\unit\\`;
     const fullOutputPath = `${__dirname}${outputPath}`;
     const mockRect = <BoundingRect> { left: 0, top: 0, width: 100, height: 100 };
     const takeScreenshot = TakeScreenshot();
-    <string> await takeScreenshot(mockRect, outputPath);
+    <string> await takeScreenshot(mockRect, `${__dirname}${outputPath}`);
     const findItemRect = FindItemRect();
     const rect = findItemRect(inputPath, fullOutputPath);
     const cropItem = CropItem();
@@ -96,6 +98,53 @@ describe('Unit test - Process finding and getting info of window', () => {
     const parsedResult = path.parse(resultPath);
     parsedResult.base.should.be.eql('item.png');
   });
+
+  it('should perform the whole logic of taking a screenshot and processing the item', async () => {
+    const inputPath = `${__dirname}\\images\\examples\\testing-item.png`;
+    const fullOutputPath = `${__dirname}\\images\\unit\\`;
+    const mockRect = <WindowBoundingRect> { left: 5, top: 5, right: 5, bottom: 5 };
+    const HWNDMock = 5;
+
+    const winAPI = <WinAPI> MockWinAPI(HWNDMock, mockRect);
+    const getWindowBoudingRect = GetWindowBoudingRect(winAPI);
+    const getGameClientRect = GetGameClientRect(getWindowBoudingRect);
+    const waitForGameWindow = WaitForGameWindow(winAPI);
+    const takeScreenshot = TakeScreenshotMock();
+    const findItemRect = FindItemRect();
+    const cropItem = CropItem();
+    const GetGame = GetGameByWindowTitle(winAPI);
+
+    const processItem = <Function> ProcessItem(
+      getGameClientRect,
+      waitForGameWindow,
+      takeScreenshot,
+      findItemRect,
+      cropItem,
+      GetGame
+    );
+    const resultPath = await processItem(inputPath, fullOutputPath);
+    const parsedResult = path.parse(resultPath);
+    parsedResult.base.should.be.eql('item.png');
+  });
+
+  function ProcessItem(
+    GetGameClientRect: Function, 
+    WaitForGameWindow: Function, 
+    TakeScreenshot: Function, 
+    FindItemRect: Function, 
+    CropItem: Function,
+    GetGame: Function
+  ) {
+    return async (imagePath: string, outputPath: string) => {
+      const HWND = <Number> GetGame();
+      await WaitForGameWindow(HWND);
+      const rect = GetGameClientRect(HWND);
+      const gameScreenshotPath = <string> await TakeScreenshot(rect, outputPath);
+      const itemRect = FindItemRect(gameScreenshotPath, outputPath);
+      const resultOutputPath = `${outputPath}item.png`;
+      return await CropItem(imagePath, resultOutputPath, itemRect);
+    }
+  }
 
   function MockWinAPI(FindWindowAResult: Number, ClientRect?: WindowBoundingRect): WinAPI {
     return {
@@ -110,6 +159,14 @@ describe('Unit test - Process finding and getting info of window', () => {
       SetActiveWindow: () => {},
     } 
   }
+  
+  function TakeScreenshotMock() {
+    const mockScreenshotPath = `${__dirname}\\images\\examples\\testing-item.png`;
+    return (rect: BoundingRect, outputPath: string) => mockScreenshotPath;
+  };
+
+  beforeEach((done) => _cleanImages(done));
+  after((done) => _cleanImages(done));
 });
 
 describe('Integration test - Process finding and getting info of window', () => {
@@ -161,7 +218,7 @@ describe('Integration test - Process finding and getting info of window', () => 
     const getGameClientRect = GetGameClientRect(getWindowBoudingRect);
     const rect = getGameClientRect(HWND);
     const takeScreenshot = TakeScreenshot();
-    const outputPath = `\\images\\integration\\`;
+    const outputPath = `${__dirname}\\images\\integration\\`;
     const screenshotPath = <string> await takeScreenshot(rect, outputPath);
     const stats = await statSync(screenshotPath);
     should(stats.isFile()).be.eql(true);
@@ -177,7 +234,7 @@ describe('Integration test - Process finding and getting info of window', () => 
     const getGameClientRect = GetGameClientRect(getWindowBoudingRect);
     const gameRect = getGameClientRect(HWND);
     const takeScreenshot = TakeScreenshot();
-    const screenshotPath = <string> await takeScreenshot(gameRect, outputPath);
+    const screenshotPath = <string> await takeScreenshot(gameRect, `${__dirname}${outputPath}`);
     const findItemRect = FindItemRect();
     const rect = findItemRect(screenshotPath, fullOutputPath);
     rect.top.should.be.above(-1);
@@ -187,7 +244,6 @@ describe('Integration test - Process finding and getting info of window', () => 
   });
 
   it('should save the item crop result', async () => {
-
     const findItemRect = FindItemRect();
     const winAPI = <WinAPI> WinAPI();
     const getGame = GetGameByWindowTitle(winAPI);
@@ -199,15 +255,18 @@ describe('Integration test - Process finding and getting info of window', () => 
     const outputPath = `\\images\\integration\\`;
     const fullOutputPath = `${__dirname}${outputPath}`;
 
-    const HWND = <Number> getGame();    
+    const HWND = <Number> getGame();
     const rect = getGameClientRect(HWND);
-    const screenshotPath = <string> await takeScreenshot(rect, outputPath);
+    const screenshotPath = <string> await takeScreenshot(rect, `${__dirname}${outputPath}`);
     const itemPosition = findItemRect(screenshotPath, fullOutputPath);
     const resultOutputPath = `${fullOutputPath}item.png`;
     const resultPath = await cropItem(screenshotPath, resultOutputPath, itemPosition);
     const parsedResult = path.parse(resultPath);
     parsedResult.base.should.be.eql('item.png');
   });
+
+  beforeEach((done) => _cleanImages(done));
+  after((done) => _cleanImages(done));
 
 });
 
@@ -278,8 +337,8 @@ function GetGameClientRect(GetWindowBoudingRect: Function) {
     return { 
       left: boundingRect.left + HORIZONTAL_OFFSET, 
       top: boundingRect.top + VERTICAL_OFFSET, 
-      width: width - HORIZONTAL_OFFSET, 
-      height: height - VERTICAL_OFFSET - BOTTOM_ADJUSTMENT
+      width: Math.abs(width - HORIZONTAL_OFFSET), 
+      height: Math.abs(height - VERTICAL_OFFSET - BOTTOM_ADJUSTMENT)
     };
   };
 }
@@ -301,8 +360,8 @@ function TakeScreenshot() {
   const dirname = path.resolve(__dirname);
   const SCREENSHOT_MAKER_PATH = `${dirname}\\..\\bin\\nircmd.exe`;
   return (rect: BoundingRect, outputPath: string) => new Promise((resolve, reject) => {
-    const screenshotPath = `${dirname}${outputPath}full-screen.png`;
-    const screenshotPathOutput = `${dirname}${outputPath}diablo-2.png`;
+    const screenshotPath = `${outputPath}full-screen.png`;
+    const screenshotPathOutput = `${outputPath}diablo-2.png`;
     spawnSync(SCREENSHOT_MAKER_PATH, ['savescreenshotfull', screenshotPath]);
     sharp(screenshotPath)
     .extract(rect)
@@ -347,4 +406,10 @@ function CropItem() {
         resolve(outputPath);
       });
   })
+}
+
+function _cleanImages(done: Function) {
+  fsExtra.emptyDirSync(`${__dirname}\\images\\unit`);
+  fsExtra.emptyDirSync(`${__dirname}\\images\\integration`);
+  done();
 }
