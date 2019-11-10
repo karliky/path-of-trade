@@ -1,5 +1,5 @@
 import ProcessItem from "./process-item";
 
-module.exports = {
+export {
   ProcessItem
 }
