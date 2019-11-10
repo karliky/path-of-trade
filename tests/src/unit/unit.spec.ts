@@ -5,6 +5,8 @@ const should =  require('should');
 const fsExtra = require('fs-extra');
 import 'should';
 
+import ProcessItem from "../../../src/actions/process-item";
+
 import CropItem from "../../../src/domain/crop-item";
 import FindItemRect from "../../../src/domain/find-item-rect";
 import GetGameClientRect from "../../../src/domain/get-game-client-rect";
@@ -131,25 +133,6 @@ describe('Unit test - Process finding and getting info of window', () => {
     const parsedResult = path.parse(resultPath);
     parsedResult.base.should.be.eql('item.png');
   });
-
-  function ProcessItem(
-    GetGameClientRect: Function, 
-    WaitForGameWindow: Function, 
-    TakeScreenshot: Function, 
-    FindItemRect: Function, 
-    CropItem: Function,
-    GetGame: Function
-  ) {
-    return async (imagePath: string, outputPath: string) => {
-      const HWND = <Number> GetGame();
-      await WaitForGameWindow(HWND);
-      const rect = GetGameClientRect(HWND);
-      const gameScreenshotPath = <string> await TakeScreenshot(rect, outputPath);
-      const itemRect = FindItemRect(gameScreenshotPath, outputPath);
-      const resultOutputPath = `${outputPath}item.png`;
-      return await CropItem(imagePath, resultOutputPath, itemRect);
-    }
-  }
 
   function MockWinAPI(FindWindowAResult: Number, ClientRect?: WindowBoundingRect): WinAPI {
     return {

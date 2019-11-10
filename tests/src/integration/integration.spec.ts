@@ -4,6 +4,8 @@ const path = require('path');
 const should =  require('should');
 const fsExtra = require('fs-extra');
 
+import ProcessItem from "../../../src/actions/process-item";
+
 import 'should';
 import CropItem from "../../../src/domain/crop-item";
 import FindItemRect from "../../../src/domain/find-item-rect";
@@ -113,6 +115,32 @@ describe('Integration test - Process finding and getting info of window', () => 
     parsedResult.base.should.be.eql('item.png');
   });
 
+  it('should perform the whole logic of taking a screenshot and processing the item', async () => {
+    const inputPath = `${rootPath}\\images\\examples\\testing-item.png`;
+    const fullOutputPath = `${rootPath}\\images\\unit\\`;
+
+    const winAPI = <WinAPI> WinAPI();
+    const getWindowBoudingRect = GetWindowBoudingRect(winAPI);
+    const getGameClientRect = GetGameClientRect(getWindowBoudingRect);
+    const waitForGameWindow = WaitForGameWindow(winAPI);
+    const takeScreenshot = TakeScreenshot();
+    const findItemRect = FindItemRect();
+    const cropItem = CropItem();
+    const GetGame = GetGameByWindowTitle(winAPI);
+
+    const processItem = <Function> ProcessItem(
+      getGameClientRect,
+      waitForGameWindow,
+      takeScreenshot,
+      findItemRect,
+      cropItem,
+      GetGame
+    );
+    const resultPath = await processItem(inputPath, fullOutputPath);
+    const parsedResult = path.parse(resultPath);
+    parsedResult.base.should.be.eql('item.png');
+  });
+
   beforeEach((done) => _cleanImages(done));
   after((done) => _cleanImages(done));
 
@@ -128,4 +156,11 @@ interface WinAPI {
   GetWindowRect: Function;
   FindWindowA: Function;
   SetActiveWindow: Function;
+}
+
+interface WindowBoundingRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
 }
