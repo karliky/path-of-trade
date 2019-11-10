@@ -5,8 +5,6 @@ const should =  require('should');
 const fsExtra = require('fs-extra');
 import 'should';
 
-const rootPath = `${__dirname}\\..\\..`;
-
 import CropItem from "../../../src/domain/crop-item";
 import FindItemRect from "../../../src/domain/find-item-rect";
 import GetGameClientRect from "../../../src/domain/get-game-client-rect";
@@ -15,6 +13,8 @@ import WinAPI from "../../../src/infrastructure/win-api";
 import GetGameByWindowTitle from "../../../src/infrastructure/get-game-by-window-title";
 import GetWindowBoudingRect from "../../../src/infrastructure/get-window-bouding-rect";
 import WaitForGameWindow from "../../../src/infrastructure/wait-for-game-window";
+
+const rootPath = `${__dirname}\\..\\..`;
 
 describe('Unit test - Process finding and getting info of window', () => {
 
