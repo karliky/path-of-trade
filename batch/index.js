@@ -6,7 +6,6 @@ const sharp = require('sharp');
 const StructType = require('ref-struct');
 const { spawnSync } = require('child_process');
 
-
 const stringType = ref.types.CString;
 const stringPtr = ref.refType(stringType);
 const longType = ref.types.long;

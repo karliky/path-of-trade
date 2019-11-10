@@ -4,13 +4,15 @@ const ref = require('ref');
 const { statSync, unlinkSync } = require('fs');
 const path = require('path');
 const StructType = require('ref-struct');
-const sharp = require('sharp');
-const { spawnSync } = require('child_process');
 const should =  require('should');
 const fsExtra = require('fs-extra');
 import 'should';
 
 const rootPath = `${__dirname}\\..\\..`;
+
+import CropItem from "..\\..\\..\\src\\domain\\crop-item";
+import FindItemRect from "..\\..\\..\\src\\domain\\find-item-rect";
+import TakeScreenshot from "..\\..\\..\\src\\domain\\take-screenshot";
 
 describe('Integration test - Process finding and getting info of window', () => {
 
@@ -125,13 +127,6 @@ interface WindowBoundingRect {
   bottom: number;
 }
 
-interface BoundingRect { 
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
 function GetWindowBoudingRect(lib: WinAPI): Function {
   const longType = ref.types.long;
   const windStruct = StructType({
@@ -198,57 +193,6 @@ function WaitForGameWindow(lib: WinAPI) {
       resolve();
     }
   }
-}
-
-function TakeScreenshot() {
-  const dirname = path.resolve(rootPath);
-  const SCREENSHOT_MAKER_PATH = `${dirname}\\..\\bin\\nircmd.exe`;
-  return (rect: BoundingRect, outputPath: string) => new Promise((resolve, reject) => {
-    const screenshotPath = `${outputPath}full-screen.png`;
-    const screenshotPathOutput = `${outputPath}diablo-2.png`;
-    spawnSync(SCREENSHOT_MAKER_PATH, ['savescreenshotfull', screenshotPath]);
-    sharp(screenshotPath)
-    .extract(rect)
-    .toFile(screenshotPathOutput, handleScreenshot(resolve, reject, screenshotPath, screenshotPathOutput));
-  });
-
-  function handleScreenshot(resolve: Function, reject: Function, screenshotPath: string, screenshotPathOutput: string) {
-    return (err: Error) => {
-      if (err) return reject(err);
-      try {
-        unlinkSync(screenshotPath);
-      } catch (error) {
-        console.error('Could not delete file', error);
-      } finally {
-        resolve(screenshotPathOutput);
-      }
-    }
-  }
-}
-
-function FindItemRect() {
-  const dirname = path.resolve(rootPath);
-  const pyItemFinder = `${dirname}\\..\\python\\find-contour.py`;
-  return (inputPath: string, outputPath: string): BoundingRect => {
-    try {
-      const spawn = spawnSync('python', [ pyItemFinder, '--input', inputPath, '--output', outputPath ]);
-      return JSON.parse(spawn.stdout.toString());
-    } catch (error) {
-      console.error('error', error.message);
-      return { top: 0, left: 0, width: 0, height: 0 };
-    }
-  }
-}
-
-function CropItem() {
-  return (inputPath: string, outputPath: string, rect: BoundingRect) => new Promise((resolve, reject) => {
-    return sharp(inputPath)
-      .extract(rect)
-      .toFile(outputPath, function(err: Error) {
-        if (err) return reject(err);
-        resolve(outputPath);
-      });
-  })
 }
 
 function _cleanImages(done: Function) {

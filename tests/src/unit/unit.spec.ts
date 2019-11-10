@@ -1,16 +1,17 @@
 
 const ffi = require('ffi');
 const ref = require('ref');
-const { statSync, unlinkSync } = require('fs');
+const { statSync } = require('fs');
 const path = require('path');
 const StructType = require('ref-struct');
-const sharp = require('sharp');
 const { spawnSync } = require('child_process');
 const should =  require('should');
 const fsExtra = require('fs-extra');
 import 'should';
 
 const rootPath = `${__dirname}\\..\\..`;
+
+import CropItem from "..\\..\\..\\src\\domain\\crop-item";
 
 describe('Unit test - Process finding and getting info of window', () => {
 
@@ -268,17 +269,6 @@ function FindItemRect() {
       return { top: 0, left: 0, width: 0, height: 0 };
     }
   }
-}
-
-function CropItem() {
-  return (inputPath: string, outputPath: string, rect: BoundingRect) => new Promise((resolve, reject) => {
-    return sharp(inputPath)
-      .extract(rect)
-      .toFile(outputPath, function(err: Error) {
-        if (err) return reject(err);
-        resolve(outputPath);
-      });
-  })
 }
 
 function _cleanImages(done: Function) {
