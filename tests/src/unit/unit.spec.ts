@@ -1,10 +1,6 @@
 
-const ffi = require('ffi');
-const ref = require('ref');
 const { statSync } = require('fs');
 const path = require('path');
-const StructType = require('ref-struct');
-const { spawnSync } = require('child_process');
 const should =  require('should');
 const fsExtra = require('fs-extra');
 import 'should';
