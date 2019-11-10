@@ -2,9 +2,10 @@
   "name": "path-of-trade",
   "version": "1.0.0",
   "description": "Path of Diablo trading made easy",
-  "main": "index.js",
+  "main": "src/",
   "scripts": {
-    "test": "set NODE_ENV=test&& mocha -r ts-node/register tests/**/*.spec.ts"
+    "test": "set NODE_ENV=test&& mocha -r ts-node/register tests/**/*.spec.ts",
+    "build": "tsc"
   },
   "author": "Carlos Hernández Gómez - Karliky",
   "license": "Unlicense",
