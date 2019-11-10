@@ -11,7 +11,14 @@ import 'should';
 
 const rootPath = `${__dirname}\\..\\..`;
 
-import CropItem from "..\\..\\..\\src\\domain\\crop-item";
+import CropItem from "../../../src/domain/crop-item";
+import FindItemRect from "../../../src/domain/find-item-rect";
+import GetGameClientRect from "../../../src/domain/get-game-client-rect";
+
+import WinAPI from "../../../src/infrastructure/win-api";
+import GetGameByWindowTitle from "../../../src/infrastructure/get-game-by-window-title";
+import GetWindowBoudingRect from "../../../src/infrastructure/get-window-bouding-rect";
+import WaitForGameWindow from "../../../src/infrastructure/wait-for-game-window";
 
 describe('Unit test - Process finding and getting info of window', () => {
 
@@ -171,9 +178,16 @@ describe('Unit test - Process finding and getting info of window', () => {
   after((done) => _cleanImages(done));
 });
 
-function GetGameByWindowTitle(lib: WinAPI) {
-  const GAME_WINDOW = 'Diablo II';
-  return (): Number => lib.FindWindowA(null, GAME_WINDOW);
+interface WinAPI {
+  GetForegroundWindow: Function;
+  GetWindowRect: Function;
+  FindWindowA: Function;
+  SetActiveWindow: Function;
+}
+
+function _cleanImages(done: Function) {
+  fsExtra.emptyDirSync(`${rootPath}\\images\\unit`);
+  done();
 }
 
 interface WindowBoundingRect {
@@ -188,90 +202,4 @@ interface BoundingRect {
   top: number;
   width: number;
   height: number;
-}
-
-function GetWindowBoudingRect(lib: WinAPI): Function {
-  const longType = ref.types.long;
-  const windStruct = StructType({
-    left: longType,
-    top: longType,
-    right: longType,
-    bottom: longType
-  });
-
-  return (HWND: Number): WindowBoundingRect => {
-    const windRect = new windStruct;
-    lib.GetWindowRect(HWND, windRect.ref());
-    return windRect; 
-  }
-}
-
-interface WinAPI {
-  GetForegroundWindow: Function;
-  GetWindowRect: Function;
-  FindWindowA: Function;
-  SetActiveWindow: Function;
-}
-
-function WinAPI(): WinAPI {
-  const stringType = ref.types.CString;
-  const stringPtr = ref.refType(stringType);
-  const longType = ref.types.long;
-  const hwndType = longType;
-
-  return new ffi.Library('user32', {
-    GetForegroundWindow: ['long', []],
-    GetWindowRect: ['long', [hwndType, stringPtr]],
-    FindWindowA: ['long', ['string', 'string']],
-    SetActiveWindow: ['long', [hwndType]],
-  });
-}
-
-function GetGameClientRect(GetWindowBoudingRect: Function) {
-  const VERTICAL_OFFSET = 30;
-  const BOTTOM_ADJUSTMENT = 100;
-  const HORIZONTAL_OFFSET = 5;
-  return (HWND: Number) => {
-    const boundingRect = GetWindowBoudingRect(HWND);
-    const width = boundingRect.right - boundingRect.left;
-    const height = boundingRect.bottom - boundingRect.top;
-    return { 
-      left: boundingRect.left + HORIZONTAL_OFFSET, 
-      top: boundingRect.top + VERTICAL_OFFSET, 
-      width: Math.abs(width - HORIZONTAL_OFFSET), 
-      height: Math.abs(height - VERTICAL_OFFSET - BOTTOM_ADJUSTMENT)
-    };
-  };
-}
-
-function WaitForGameWindow(lib: WinAPI) {
-  return async (HWND:Number) => new Promise((resolve) => {
-    if (lib.GetForegroundWindow() === HWND) return resolve();
-    const interval = <any> setInterval(() => windowDetector(interval, resolve, HWND), 100);
-  });
-
-  function windowDetector(interval: any, resolve: Function, HWND: Number) {
-    if (lib.GetForegroundWindow() === HWND) {
-      clearInterval(interval);
-      resolve();
-    }
-  }
-}
-
-function FindItemRect() {
-  const pyItemFinder = `${rootPath}\\..\\python\\find-contour.py`;
-  return (inputPath: string, outputPath: string): BoundingRect => {
-    try {
-      const spawn = spawnSync('python', [ pyItemFinder, '--input', inputPath, '--output', outputPath ]);
-      return JSON.parse(spawn.stdout.toString());
-    } catch (error) {
-      console.error('error', error.message);
-      return { top: 0, left: 0, width: 0, height: 0 };
-    }
-  }
-}
-
-function _cleanImages(done: Function) {
-  fsExtra.emptyDirSync(`${rootPath}\\images\\unit`);
-  done();
 }
