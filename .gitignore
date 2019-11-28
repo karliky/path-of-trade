@@ -3,5 +3,5 @@ node_modules
 \images\output\
 tests/images/unit/diablo-2.png
 build
-.cache
 dist
+.cache

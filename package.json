@@ -5,7 +5,8 @@
   "main": "build/main.js",
   "scripts": {
     "test": "set NODE_ENV=test&& mocha --timeout 10000 -r ts-node/register tests/**/*.spec.ts",
-    "test:build": "set NODE_ENV=test&& npm explore winapi -- npm install && mocha -r ts-node/register tests/**/*.spec.ts",
+    "test:build": "set NODE_ENV=test&& npm run winapi:build && mocha -r ts-node/register tests/**/*.spec.ts",
+    "winapi:build": "npm explore winapi -- npm install",
     "watch": "tsc -w",
     "build": "tsc && node ./build/builder.js",
     "start": "npm run build && electron ./build/main.js",
