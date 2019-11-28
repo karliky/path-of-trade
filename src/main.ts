@@ -13,9 +13,9 @@ function createWindow() {
     },
     width: 800,
   });
-
-
-  mainWindow.loadFile(path.join(__dirname, "../ui/index.html"));
+  
+  const indexPath = path.join(__dirname, "/index.html");
+  mainWindow.loadFile(indexPath);
 
   mainWindow.webContents.openDevTools();
 

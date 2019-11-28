@@ -4,11 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Path of trade</title>
     <script>var exports = {"__esModule": true};</script>
-    <script src="../build/renderer.js"></script>
 </head>
 <body>
-    hey! Listen!
+    hey! Listen! JS Updated :)
+    <script>
+    const addon = require('winapi');
+    window.winApi = addon;
+    console.log('addon', addon);
+    setTimeout(() => {
+        console.log('Welcome to jurassic park', addon.GetForegroundWindow());
+        alert('Welcome to jurassic park ' + addon.GetForegroundWindow());
+    }, 1000);
+    </script>
 </body>
 </html>

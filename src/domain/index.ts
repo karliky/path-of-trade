@@ -1,11 +1,17 @@
-import TakeScreenshots from "./take-screenshot";
+import {
+  waitForGameWindow,
+  getGameByWindowTitle,
+  getWindowBoundingRect
+} from "../infrastructure/";
+
+import TakeScreenshot from "./take-screenshot";
 import FindItemRect from "./find-item-rect";
 import CropItem from "./crop-item";
 import GetGameClientRect from "./get-game-client-rect";
 
-module.exports = {
-  CropItem,
-  FindItemRect,
-  TakeScreenshots,
-  GetGameClientRect
-}
+export const cropItem = CropItem();
+export const findItemRect = FindItemRect();
+export const takeScreenshot = TakeScreenshot();
+export const getGameClientRect = GetGameClientRect(getWindowBoundingRect);
+export const waitForGame = waitForGameWindow;
+export const getGame = getGameByWindowTitle;

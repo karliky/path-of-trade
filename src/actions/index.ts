@@ -1,5 +1,17 @@
-import ProcessItem from "./process-item";
+import { 
+  cropItem as CropItem,
+  findItemRect as FindItemRect,
+  takeScreenshot as TakeScreenshot,
+  getGameClientRect as GetGameClientRect,
+  waitForGame as WaitForGameWindow,
+  getGame as GetGame
+} from "../domain/";
 
-export {
-  ProcessItem
-}
+import processItem from "./process-item";
+
+export const ProcessItem = processItem(GetGameClientRect,
+  WaitForGameWindow,
+  TakeScreenshot,
+  FindItemRect,
+  CropItem,
+  GetGame)

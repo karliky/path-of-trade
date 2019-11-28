@@ -1,13 +1,11 @@
-const sharp = require('sharp');
+const Jimp = require('jimp');
 
 export default function() {
-    return (inputPath: string, outputPath: string, rect: BoundingRect) => new Promise((resolve, reject) => {
-        return sharp(inputPath)
-            .extract(rect)
-            .toFile(outputPath, function(err: Error) {
-                if (err) return reject(err);
-                resolve(outputPath);
-            });
+    return (inputPath: string, outputPath: string, rect: BoundingRect) => new Promise(async (resolve) => {
+        const img = await Jimp.read(inputPath);
+        const crop = img.crop(rect.left, rect.top, rect.width, rect.height)
+        await crop.writeAsync(outputPath);
+        resolve(outputPath);
     });
 }
 

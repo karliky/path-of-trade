@@ -138,13 +138,14 @@ describe('Unit test - Process finding and getting info of window', () => {
     return {
       GetForegroundWindow: () => FindWindowAResult,
       GetWindowRect: (HWND: Number, ref: Buffer) => {
-        ref.writeInt32LE(ClientRect!.left, 0);
-        ref.writeInt32LE(ClientRect!.top, 0x4);
-        ref.writeInt32LE(ClientRect!.right, 0x8);
-        ref.writeInt32LE(ClientRect!.bottom, 0xC);
+        return {
+          left: ClientRect!.left,
+          top: ClientRect!.top,
+          right: ClientRect!.right,
+          bottom: ClientRect!.bottom
+        };
       },
-      FindWindowA: (): Number => FindWindowAResult,
-      SetActiveWindow: () => {},
+      FindWindowA: (): Number => FindWindowAResult
     } 
   }
   
@@ -161,7 +162,6 @@ interface WinAPI {
   GetForegroundWindow: Function;
   GetWindowRect: Function;
   FindWindowA: Function;
-  SetActiveWindow: Function;
 }
 
 function _cleanImages(done: Function) {
