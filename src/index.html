@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Path of trade</title>
+</head>
+<body>
+    Click to capture item in 5 seconds
+    <span></span>
+    <button>Click to capture item</button>
+
+    <div id="app"></div>
+
+    <script>
+        console.log('#window.srcPath', window.srcPath, 'window.GetMiddleMouseState', window.GetMiddleMouseState)
+        const progress = document.querySelector('span');
+        document.querySelector('button').addEventListener('click', () => {
+            progress.innerText = 'Waiting for 5 seconds';
+            setTimeout(async () => {
+                progress.innerText = 'Processing...';
+                await window.ProcessItem('C:/Users/K4rli/Documents/git/path-of-trade/images/output/');
+                progress.innerText = 'Processed!';
+            }, 5000);
+        });
+
+        const head  = document.getElementsByTagName('head')[0];
+        const link  = document.createElement('link');
+        link.id   = 'main-style';
+        link.rel  = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.srcPath + 'index.css';
+        link.media = 'all';
+        head.appendChild(link);
+    </script>
+</body>
+</html>

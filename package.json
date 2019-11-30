@@ -8,9 +8,9 @@
     "test:build": "set NODE_ENV=test&& npm run winapi:build && mocha -r ts-node/register tests/**/*.spec.ts",
     "winapi:build": "npm explore winapi -- npm install",
     "watch": "tsc -w",
-    "build": "tsc && node ./build/builder.js",
+    "build": "tsc ./src/main.ts ./src/renderer.ts ./src/preload.ts ./src/compiler.ts --outDir build && parcel build src/index.html ./src/index.js --no-minify --out-dir build/",
     "start": "npm run build && electron ./build/main.js",
-    "pack": "npm run build && electron-builder --dir",
+    "pack": "set NODE_ENV=production&& npm run build && electron-builder --dir && node ./build/compiler.js",
     "postinstall": "electron-builder install-app-deps"
   },
   "nodeGypRebuild": "true",
@@ -23,6 +23,8 @@
   "author": "Carlos Hernández Gómez - Karliky",
   "license": "Unlicense",
   "devDependencies": {
+    "electron": "6.1.4",
+    "electron-builder": "^22.1.0",
     "electron-rebuild": "^1.8.6",
     "eslint": "^6.1.0",
     "eslint-config-airbnb": "^18.0.1",
@@ -31,10 +33,12 @@
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^1.7.0",
     "mocha": "^6.2.2",
+    "pug": "^2.0.4",
+    "sass": "^1.23.7",
     "should": "^13.2.3",
     "ts-node": "^8.4.1",
-    "electron": "6.1.4",
-    "electron-builder": "^22.1.0"
+    "vue": "^2.6.10",
+    "vue-template-compiler": "^2.6.10"
   },
   "dependencies": {
     "@types/fs-extra": "^8.0.1",

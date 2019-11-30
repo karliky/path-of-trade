@@ -1,7 +1,8 @@
 
 export default function(lib: WinAPI): Function {
-  const GAME_WINDOW = 'Diablo II';
-  return (): Number => lib.FindWindowA(null, GAME_WINDOW);
+  return (): Number => {
+    return lib.GetKeyState();
+  }
 }
 
 interface WinAPI {

@@ -6,13 +6,13 @@ export default function(
   FindItemRect: Function, 
   CropItem: Function,
   GetGame: Function) {
-    return async (outputPath: string) => {
+    return async (fileName: string, outputPath: string) => {
       const HWND = <Number> GetGame();
       await WaitForGameWindow(HWND);
       const rect = GetGameClientRect(HWND);
       const gameScreenshotPath = <string> await TakeScreenshot(rect, outputPath);
       const itemRect = FindItemRect(gameScreenshotPath, outputPath);
-      const resultOutputPath = `${outputPath}item.png`;
+      const resultOutputPath = `${outputPath}${fileName}.png`;
       return await CropItem(gameScreenshotPath, resultOutputPath, itemRect);
     }
   }

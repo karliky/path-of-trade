@@ -5,3 +5,4 @@ tests/images/unit/diablo-2.png
 build
 dist
 .cache
+images/output

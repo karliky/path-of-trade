@@ -8,4 +8,5 @@ interface WinAPI {
   GetForegroundWindow: Function;
   GetWindowRect: Function;
   FindWindowA: Function;
+  GetKeyState: Function;
 }

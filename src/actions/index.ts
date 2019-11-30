@@ -4,10 +4,12 @@ import {
   takeScreenshot as TakeScreenshot,
   getGameClientRect as GetGameClientRect,
   waitForGame as WaitForGameWindow,
-  getGame as GetGame
+  getGame as GetGame,
+  getMiddleMouseState as GetMiddleMouseStateService
 } from "../domain/";
 
-import processItem from "./process-item";
+import processItem from "./processItem";
+import getMiddleMouseState from "./getMiddleMouseState";
 
 export const ProcessItem = processItem(GetGameClientRect,
   WaitForGameWindow,
@@ -15,3 +17,5 @@ export const ProcessItem = processItem(GetGameClientRect,
   FindItemRect,
   CropItem,
   GetGame)
+
+export const GetMiddleMouseState = getMiddleMouseState(GetMiddleMouseStateService);

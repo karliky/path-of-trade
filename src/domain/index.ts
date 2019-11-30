@@ -1,7 +1,8 @@
 import {
   waitForGameWindow,
   getGameByWindowTitle,
-  getWindowBoundingRect
+  getWindowBoundingRect,
+  getMiddleMouseState as GetMiddleMouseState
 } from "../infrastructure/";
 
 import TakeScreenshot from "./take-screenshot";
@@ -15,3 +16,4 @@ export const takeScreenshot = TakeScreenshot();
 export const getGameClientRect = GetGameClientRect(getWindowBoundingRect);
 export const waitForGame = waitForGameWindow;
 export const getGame = getGameByWindowTitle;
+export const getMiddleMouseState = GetMiddleMouseState;

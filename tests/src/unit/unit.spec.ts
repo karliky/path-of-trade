@@ -145,7 +145,8 @@ describe('Unit test - Process finding and getting info of window', () => {
           bottom: ClientRect!.bottom
         };
       },
-      FindWindowA: (): Number => FindWindowAResult
+      FindWindowA: (): Number => FindWindowAResult,
+      GetKeyState: (): Number => FindWindowAResult
     } 
   }
   
@@ -162,6 +163,7 @@ interface WinAPI {
   GetForegroundWindow: Function;
   GetWindowRect: Function;
   FindWindowA: Function;
+  GetKeyState: Function;
 }
 
 function _cleanImages(done: Function) {
