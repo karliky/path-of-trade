@@ -1,6 +1,12 @@
 <template>
-  <ul>
-    <li v-for="item in items.slice().reverse()" :key="item">
+  <ul class="noBullets">
+    <li v-for="loading in loaders" :key="loading">
+      <content-placeholders>
+        <content-placeholders-heading :img="true" />
+        <content-placeholders-text :lines="3" />
+      </content-placeholders>
+   </li>
+   <li v-for="item in items.slice().reverse()" :key="item">
       <img :src="`${item}`" alt="">
    </li>
   </ul>
@@ -15,7 +21,8 @@ export default Vue.extend({
   data() {
     return {
       isPressed: false,
-      items: []
+      items: [],
+      loaders: []
     };
   },
   mounted() {
@@ -31,12 +38,15 @@ export default Vue.extend({
     }, 16);
   },
   watch: {
-    isPressed: async function (newState) { 
+    isPressed: async function (newState) {
+      const fileName = `item-${new Date().getTime()}`;
       if (newState === true) {
-        const fileName = `item-${new Date().getTime()}`
+        this.loaders.push(fileName);
         const path = await window.ProcessItem(fileName, 'C:/Users/K4rli/Documents/git/path-of-trade/images/output/');
-        console.log('New item', path);
-        this.items.push(path);
+        setTimeout(() => { 
+          this.items.push(path);
+          this.loaders.shift();
+        }, 100);
       }
     }
   }
@@ -44,7 +54,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.container {
-  color: green;
+.noBullets {
+  list-style-type: none;
 }
 </style>
