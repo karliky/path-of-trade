@@ -9,8 +9,9 @@ def Threshold_Demo(inputPath, outputPath):
     threshold_value = 0
     _, dst = cv.threshold(src_gray, threshold_value, max_binary_value, threshold_type )
     outputResultPath = outputPath + 'result-threshold.png'
-    blur = cv.medianBlur(dst, 3)
-    cv.imwrite(outputResultPath, blur)
+    kernel = np.ones((1,2),np.uint8)
+    erosion = cv.erode(dst,kernel,iterations = 1)
+    cv.imwrite(outputResultPath, erosion)
     return outputResultPath
 
 def ROIExtractor(inputPath, outputPath):
